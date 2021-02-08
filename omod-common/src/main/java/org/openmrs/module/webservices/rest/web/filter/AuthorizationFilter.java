@@ -29,18 +29,17 @@ import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.RestUtil;
 
 /**
- * Filter intended for all /ws/rest calls that allows the user to authenticate
- * via Basic authentication. (It will not fail on invalid or missing
- * credentials. We count on the API to throw exceptions if an unauthenticated
- * user tries to do something they are not allowed to do.) <br/>
+ * Filter intended for all /ws/rest calls that allows the user to authenticate via Basic
+ * authentication. (It will not fail on invalid or missing credentials. We count on the API to throw
+ * exceptions if an unauthenticated user tries to do something they are not allowed to do.) <br/>
  * <br/>
  * IP address authorization is also performed based on the global property:
  * {@link RestConstants#ALLOWED_IPS_GLOBAL_PROPERTY_NAME}
  */
 public class AuthorizationFilter implements Filter {
-
+	
 	protected final Log log = LogFactory.getLog(getClass());
-
+	
 	/**
 	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
 	 */
@@ -48,7 +47,7 @@ public class AuthorizationFilter implements Filter {
 	public void init(FilterConfig arg0) throws ServletException {
 		log.debug("Initializing REST WS Authorization filter");
 	}
-
+	
 	/**
 	 * @see javax.servlet.Filter#destroy()
 	 */
@@ -56,34 +55,34 @@ public class AuthorizationFilter implements Filter {
 	public void destroy() {
 		log.debug("Destroying REST WS Authorization filter");
 	}
-
+	
 	/**
 	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
 	 *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
 	 */
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-
+	        throws IOException, ServletException {
+		
 		// check the IP address first. If its not valid, return a 403
 		if (!RestUtil.isIpAllowed(request.getRemoteAddr())) {
 			// the ip address is not valid, set a 403 http error code
 			HttpServletResponse httpresponse = (HttpServletResponse) response;
 			httpresponse.sendError(HttpServletResponse.SC_FORBIDDEN,
-					"IP address '" + request.getRemoteAddr() + "' is not authorized");
+			    "IP address '" + request.getRemoteAddr() + "' is not authorized");
 			return;
 		}
-
+		
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
-
+		
 		// skip if the session has timed out, we're already authenticated, or it's not
 		// an HTTP request
 		if (request instanceof HttpServletRequest) {
 			if (httpRequest.getRequestedSessionId() != null && !httpRequest.isRequestedSessionIdValid()) {
 				httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Session timed out");
 			}
-
+			
 			if (!Context.isAuthenticated()) {
 				String basicAuth = httpRequest.getHeader("Authorization");
 				if (basicAuth != null) {
@@ -95,24 +94,25 @@ public class AuthorizationFilter implements Filter {
 						Context.authenticate(userAndPass[0], userAndPass[1]);
 						if (log.isDebugEnabled())
 							log.debug("authenticated " + userAndPass[0]);
-					} catch (Exception ex) {
+					}
+					catch (Exception ex) {
 						// This filter never stops execution. If the user failed to
 						// authenticate, that will be caught later.
 					}
 				}
 			}
-
+			
 			String requestOrigin = httpRequest.getHeader("Origin");
-
+			
 			httpResponse.addHeader("Access-Control-Allow-Origin", requestOrigin);
 			httpResponse.addHeader("Access-Control-Allow-Methods", "POST, GET, PUT, UPDATE, OPTIONS, DELETE");
 			httpResponse.setHeader("Access-Control-Allow-Headers", "authorization, content-type");
-
+			
 			if (httpRequest.getMethod().equals("OPTIONS")) {
 				httpResponse.setStatus(HttpServletResponse.SC_OK);
 			}
 		}
-
+		
 		// continue with the filter chain (unless IP is not allowed)
 		chain.doFilter(httpRequest, httpResponse);
 	}
