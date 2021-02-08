@@ -113,6 +113,10 @@
 		<filter-name>REST Web Service Authorization</filter-name>
 		<url-pattern>/ws/rest/*</url-pattern>
 	</filter-mapping>
+	<filter-mapping>
+		<filter-name>REST Web Service Authorization</filter-name>
+		<url-pattern>/ws/hisp/*</url-pattern>
+	</filter-mapping>
     <filter-mapping>
         <filter-name>compressionFilter</filter-name>
         <url-pattern>/ws/rest/*</url-pattern>
