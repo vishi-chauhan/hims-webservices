@@ -67,10 +67,13 @@ public class SessionController1_9 extends BaseRestController {
 		SimpleObject session = new SimpleObject();
 		session.add("sessionId", request.getSessionId()).add("authenticated", authenticated);
 		if (authenticated) {
-			
-			LoginAuditService service = Context.getService(LoginAuditService.class);
-			service.saveLoginDetail(Context.getAuthenticatedUser().getUserId());
-			
+			try {
+				LoginAuditService service = Context.getService(LoginAuditService.class);
+				service.saveLoginDetail(Context.getAuthenticatedUser().getUserId());
+			}
+			catch (Exception ex) {
+				
+			}
 			session.add("user", ConversionUtil.convertToRepresentation(Context.getAuthenticatedUser(),
 			    new CustomRepresentation(USER_CUSTOM_REP)));
 			session.add("locale", Context.getLocale());
@@ -125,10 +128,13 @@ public class SessionController1_9 extends BaseRestController {
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void delete() {
-		
-		LoginAuditService service = Context.getService(LoginAuditService.class);
-		service.saveLogoutDetail(Context.getAuthenticatedUser().getUserId());
-		
+		try {
+			LoginAuditService service = Context.getService(LoginAuditService.class);
+			service.saveLogoutDetail(Context.getAuthenticatedUser().getUserId());
+		}
+		catch (Exception ex) {
+			
+		}
 		Context.logout();
 	}
 	
