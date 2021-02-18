@@ -29,6 +29,7 @@ import org.openmrs.module.webservices.rest.web.representation.CustomRepresentati
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,6 +52,10 @@ public class SessionController1_9 extends BaseRestController {
 	@Autowired
 	RestService restService;
 	
+	@Autowired
+	@Qualifier("loginauditService")
+	LoginAuditService autologinservice;
+	
 	/**
 	 * Tells the user their sessionId, and whether or not they are authenticated.
 	 * 
@@ -68,8 +73,8 @@ public class SessionController1_9 extends BaseRestController {
 		session.add("sessionId", request.getSessionId()).add("authenticated", authenticated);
 		if (authenticated) {
 			try {
-				LoginAuditService service = Context.getService(LoginAuditService.class);
-				service.saveLoginDetail(Context.getAuthenticatedUser().getUserId());
+				
+				autologinservice.saveLoginDetail(Context.getAuthenticatedUser().getUserId());
 			}
 			catch (Exception ex) {
 				
@@ -129,8 +134,8 @@ public class SessionController1_9 extends BaseRestController {
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void delete() {
 		try {
-			LoginAuditService service = Context.getService(LoginAuditService.class);
-			service.saveLogoutDetail(Context.getAuthenticatedUser().getUserId());
+			
+			autologinservice.saveLogoutDetail(Context.getAuthenticatedUser().getUserId());
 		}
 		catch (Exception ex) {
 			
