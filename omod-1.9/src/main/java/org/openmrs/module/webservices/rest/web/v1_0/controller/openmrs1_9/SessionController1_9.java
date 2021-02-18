@@ -9,10 +9,18 @@
  */
 package org.openmrs.module.webservices.rest.web.v1_0.controller.openmrs1_9;
 
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.LocaleUtils;
 import org.openmrs.Location;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.loginaudit.LoginAuditService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -29,12 +37,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Controller that lets a client check the status of their session, and log out. (Authenticating is
@@ -57,6 +59,7 @@ public class SessionController1_9 extends BaseRestController {
 	 * @should return the session id if the user is authenticated
 	 * @should return the session id if the user is not authenticated
 	 */
+	
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public Object get(WebRequest request) {
@@ -64,13 +67,19 @@ public class SessionController1_9 extends BaseRestController {
 		SimpleObject session = new SimpleObject();
 		session.add("sessionId", request.getSessionId()).add("authenticated", authenticated);
 		if (authenticated) {
+			
+			LoginAuditService service = Context.getService(LoginAuditService.class);
+			service.saveLoginDetail(Context.getAuthenticatedUser().getUserId());
+			
 			session.add("user", ConversionUtil.convertToRepresentation(Context.getAuthenticatedUser(),
 			    new CustomRepresentation(USER_CUSTOM_REP)));
 			session.add("locale", Context.getLocale());
 			session.add("allowedLocales", Context.getAdministrationService().getAllowedLocales());
 			session.add("sessionLocation",
 			    ConversionUtil.convertToRepresentation(Context.getUserContext().getLocation(), Representation.REF));
+			
 		}
+		
 		return session;
 	}
 	
@@ -116,6 +125,10 @@ public class SessionController1_9 extends BaseRestController {
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void delete() {
+		
+		LoginAuditService service = Context.getService(LoginAuditService.class);
+		service.saveLogoutDetail(Context.getAuthenticatedUser().getUserId());
+		
 		Context.logout();
 	}
 	

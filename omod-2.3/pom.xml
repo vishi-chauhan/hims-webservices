@@ -112,6 +112,12 @@
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
+        
+       <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>loginaudit-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
         <dependency>
             <groupId>org.openmrs.api</groupId>
