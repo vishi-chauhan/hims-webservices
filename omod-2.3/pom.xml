@@ -113,13 +113,7 @@
             <scope>test</scope>
         </dependency>
         
-       <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>loginaudit-api</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
+         <dependency>
             <groupId>org.openmrs.api</groupId>
             <artifactId>openmrs-api</artifactId>
             <version>${openmrs.version.2.3.0}</version><!--$NO-MVN-MAN-VER$-->

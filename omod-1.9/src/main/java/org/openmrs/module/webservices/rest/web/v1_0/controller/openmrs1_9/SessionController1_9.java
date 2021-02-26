@@ -20,7 +20,6 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.openmrs.Location;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.loginaudit.LoginAuditService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -29,7 +28,6 @@ import org.openmrs.module.webservices.rest.web.representation.CustomRepresentati
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,10 +50,6 @@ public class SessionController1_9 extends BaseRestController {
 	@Autowired
 	RestService restService;
 	
-	@Autowired
-	@Qualifier("loginauditService")
-	LoginAuditService autologinservice;
-	
 	/**
 	 * Tells the user their sessionId, and whether or not they are authenticated.
 	 * 
@@ -72,13 +66,7 @@ public class SessionController1_9 extends BaseRestController {
 		SimpleObject session = new SimpleObject();
 		session.add("sessionId", request.getSessionId()).add("authenticated", authenticated);
 		if (authenticated) {
-			try {
-				
-				autologinservice.saveLoginDetail(Context.getAuthenticatedUser().getUserId());
-			}
-			catch (Exception ex) {
-				
-			}
+			
 			session.add("user", ConversionUtil.convertToRepresentation(Context.getAuthenticatedUser(),
 			    new CustomRepresentation(USER_CUSTOM_REP)));
 			session.add("locale", Context.getLocale());
@@ -133,13 +121,7 @@ public class SessionController1_9 extends BaseRestController {
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void delete() {
-		try {
-			
-			autologinservice.saveLogoutDetail(Context.getAuthenticatedUser().getUserId());
-		}
-		catch (Exception ex) {
-			
-		}
+		
 		Context.logout();
 	}
 	

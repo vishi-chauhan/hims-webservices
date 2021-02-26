@@ -75,13 +75,7 @@
 			<type>pom</type>
 			<version>${openmrs.version.1.9}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
-	
-	<dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>loginaudit-api</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-	
+		
 	</dependencies>
 
 	<build>
