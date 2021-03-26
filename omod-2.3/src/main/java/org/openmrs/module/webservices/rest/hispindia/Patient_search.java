@@ -62,13 +62,13 @@ public class Patient_search extends BaseRestController {
 		
 		Patientlist = Context.getPatientService().getPatients(name);
 		
-		if (StringUtils.isNotBlank(lastvisitexact)) {
+		if (StringUtils.isNotBlank(lastvisitexact) && !Patientlist.isEmpty()) {
 			exvdate = new SimpleDateFormat("dd-MM-yyyy").parse(lastvisitexact);
 			patvisits = Context.getVisitService().getVisits(null, Patientlist, null, null,
 			    new DateTime(exvdate).minusDays(1).toDate(), new DateTime(exvdate).plusDays(1).toDate(), null, null,
 			    null, true, false);
 		}
-		if (StringUtils.isNotBlank(lastvisitapprox) && StringUtils.isBlank(lastvisitexact)) {
+		if (StringUtils.isNotBlank(lastvisitapprox) && StringUtils.isBlank(lastvisitexact) && !Patientlist.isEmpty()) {
 			appvdate = new SimpleDateFormat("dd-MM-yyyy").parse(lastvisitapprox);
 			patvisits = Context.getVisitService().getVisits(null, Patientlist, null, null, appvdate, null, null, null,
 			    null, true, false);
